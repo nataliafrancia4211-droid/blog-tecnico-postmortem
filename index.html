@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Técnico - Anatomía de un Fallo de Autenticación</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; }
+        h1 { color: #1a365d; border-bottom: 2px solid #2b6cb0; padding-bottom: 10px; }
+        h2 { color: #2b6cb0; margin-top: 30px; }
+        h3 { color: #2d3748; }
+        .destacado { background-color: #f7fafc; border-left: 4px solid #dd6b20; padding: 15px; margin: 20px 0; font-style: italic; }
+        ul, ol { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+    <h1>De la Deuda Técnica al Aprendizaje: Anatomía de un Fallo de Autenticación</h1>
+    <p><strong>Por:</strong> Estudiante de Desarrollo Web & QA</p>
+
+    <div class="destacado">
+        "Los errores son inevitables en entornos ágiles; la forma en que se gestionan marca la diferencia entre un equipo paralizado y uno resiliente."
+    </div>
+
+    <h2>A. Contexto</h2>
+    <p>El incidente ocurrió dentro de un entorno de desarrollo ágil basado en microservicios, específicamente durante el ciclo de despliegue continuo de la aplicación web de comercio electrónico JPetStore. El equipo se encontraba iterando en sprints de dos semanas, integrando nuevas características de experiencia de usuario mientras de manera simultánea se gestionaba una deuda técnica acumulada en los componentes de seguridad heredados del sistema.</p>
+
+    <h2>B. Problema (El Desafío Técnico)</h2>
+    <p>Inmediatamente después del último despliegue en el entorno de pruebas (Staging), se detectó una anomalía crítica: una acumulación masiva de errores recurrentes que bloqueaban por completo el módulo de inicio de sesión (Login) de los usuarios. El fallo técnico paralizó los flujos de pruebas automatizadas del equipo de Quality Assurance (QA). Inicialmente, la falta de claridad en los mensajes defensivos del sistema incrementó el tiempo de diagnóstico inicial, amenazando los plazos de entrega del incremento de producto.</p>
+
+    <h2>C. Acciones (Post-Mortem Constructivo y Blameless)</h2>
+    <p>Adoptando la metodología Blameless Post-Mortem inspirada en la cultura SRE de Google, el equipo evitó la asignación de culpas individuales y se enfocó estrictamente en las fallas sistémicas a través de los siguientes pasos:</p>
+    
+    <ol>
+        <li><strong>Reconstrucción Cronológica (Timeline):</strong> Se rastrearon los eventos desde la fusión del código (Merge) hasta la alerta del fallo, identificando que el problema se desencadenó a las 14:22 h tras la actualización de las dependencias de seguridad.</li>
+        <li><strong>Recopilación de Evidencia Objetiva:</strong> Se aislaron los archivos de registros (Logs) del servidor y las métricas de rendimiento, localizando una excepción no controlada del tipo NullPointerException en el interceptor de tokens de autenticación.</li>
+        <li><strong>Análisis de Causas Raíz mediante los "5 Porqués":</strong>
+            <ul>
+                <li><em>¿Por qué falló el login?</em> Porque el sistema arrojaba un error 500 al procesar las credenciales.</li>
+                <li><em>¿Por qué arrojaba un error 500?</em> Porque el interceptor de seguridad no encontraba un parámetro requerido.</li>
+                <li><em>¿Por qué faltaba el parámetro?</em> Porque la estructura del payload cambió en la última actualización del servicio.</li>
+                <li><em>¿Por qué cambió el payload sin aviso?</em> Porque la documentación de la API externa no estaba sincronizada.</li>
+                <li><em>¿Por qué no estaba sincronizada?</em> Porque no existía un paso de validación contractual automatizado en el pipeline de CI/CD. <strong>(Falla Fundamental)</strong></li>
+            </ul>
+        </li>
+        <li><strong>Acción y Refactorización:</strong> Se revirtió temporalmente el cambio para mitigar el impacto, se depuraron las variables, se reconfiguró el manejo de excepciones y se implementó una validación estricta de esquemas de datos.</li>
+    </ol>
+
+    <h2>D. Aprendizajes y Resiliencia Mejorada</h2>
+    <p>La resolución del incidente arrojó métricas altamente positivas y activos de conocimiento institucional estructurados:</p>
+    <ul>
+        <li><strong>Reducción del MTTR:</strong> El tiempo medio de reparación disminuyó en posteriores simulacros gracias a la creación de una guía rápida de resolución (Playbook).</li>
+        <li><strong>Impacto Cuantificable:</strong> Se logró un sistema 100% estable con una reducción proyectada del 40% en la recurrencia de errores de autenticación similares.</li>
+        <li><strong>Mejora Continua:</strong> Se automatizó la validación de contratos de API en el flujo de integración.</li>
+    </ul>
+
+    <h2>E. Reflexión sobre la Aplicación de Feedback Radicalmente Sincero</h2>
+    <p>Durante la ejecución y documentación de este post-mortem, la aplicación de un feedback radicalmente sincero y empático fue el pilar que transformó la crisis en resiliencia. En lugar de adoptar una postura defensiva u ocultar la deuda técnica por miedo a represalias (Cultura de Culpa), los miembros del equipo ejercieron la autorregulación y el reframing. Se expusieron los fallos de visibilidad del código de manera directa pero con un profundo respeto interpersonal, separando el problema de las personas. Esto fortaleció la confianza colectiva y agilizó la adopción de las tareas correctivas sin generar fricciones interdepartamentales.</p>
+
+</body>
+</html>
